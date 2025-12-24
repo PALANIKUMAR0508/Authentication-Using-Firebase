@@ -1,25 +1,43 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+import { auth } from "./Firebase/setup";
 
-function App() {
+const App = () => {
+  const [Phone, setPhone] = React.useState("");
+  const [user,setuser]=React.useState(null);
+  const [OTP,setOTP]=React.useState("")
+
+  const sendOTP = async () => {
+    try {
+      const recaptcha = new RecaptchaVerifier(auth, "recaptcha", {});
+      const confirmation = await signInWithPhoneNumber(auth, Phone, recaptcha);
+      setuser(confirmation);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const verifyOTP =async()=>{
+    try{
+     const data = await user.confirm(OTP)
+     console.log(data);
+    }catch(err){
+      console.error(err);
+    }
+
+  }
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <input
+        placeholder="Phone Number"
+        onChange={(e) => setPhone(e.target.value)}
+      />
+      <div id="recaptcha"></div>
+      <button onClick={sendOTP}>Send OTP</button>
+      <input onChange={(e)=>setOTP(e.target.value)} placeholder="OTP"/>
+      <button onClick={verifyOTP}>verifyOTP</button>
     </div>
   );
-}
+};
 
 export default App;
